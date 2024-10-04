@@ -1,3 +1,4 @@
+using StackExchange.Redis;
 using WeatherApi.Models;
 using WeatherApi.Models.Interfaces;
 using WeatherApi.Models.Options;
@@ -13,6 +14,8 @@ builder.Services.AddHttpClient(Constants.HTTP_CLIENT_NAME, httpClient =>
     builder.Configuration.GetSection(VisualCrossingOptions.VisualCrossingApi).Bind(visualCrossingApiOptions);
     httpClient.BaseAddress = new Uri(visualCrossingApiOptions.Url);
 });
+//builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Constants.REDIS_CONNECTION_STRING)));
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<IWeatherApiService, VisualCrossingApiService>();
 

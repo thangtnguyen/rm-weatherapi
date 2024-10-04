@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using WeatherApi.Models;
 using WeatherApi.Models.Entities;
 using WeatherApi.Models.Interfaces;
@@ -37,15 +35,9 @@ namespace WeatherApi.VisualCrossingService
             {
                 PropertyNameCaseInsensitive = true
             };
-            try
-            {
-                var wrapper = JsonSerializer.Deserialize<WeatherWrapper>(contentString, options);
-                return wrapper!.Days;
-            }
-            catch (Exception ex)
-            {
-                return new List<WeatherForecast>();
-            }           
+
+            var wrapper = JsonSerializer.Deserialize<WeatherWrapper>(contentString, options);
+            return wrapper!.Days;
         }
     }
 }

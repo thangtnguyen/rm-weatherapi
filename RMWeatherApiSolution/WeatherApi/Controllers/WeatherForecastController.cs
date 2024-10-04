@@ -9,11 +9,6 @@ namespace WeatherApi.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly ICacheService _cacheService;
         private readonly IWeatherApiService _weatherApiService;
@@ -28,7 +23,17 @@ namespace WeatherApi.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public async Task<IEnumerable<WeatherForecast>> Get([Required] string location)
         {
-            var result = await _weatherApiService.GetWeatherForecasts(location);
+            var upperLocation = location.ToUpper();
+
+            var cachedData = _cacheService.GetData<List<WeatherForecast>>(upperLocation);
+            if (cachedData != null)
+            {
+                return cachedData;
+            }
+
+            var expirationTime = DateTimeOffset.Now.AddMinutes(5.0);
+            var result = await _weatherApiService.GetWeatherForecasts(upperLocation);
+            _cacheService.SetData<List<WeatherForecast>>(upperLocation, result, expirationTime);
 
             return result;
         }
